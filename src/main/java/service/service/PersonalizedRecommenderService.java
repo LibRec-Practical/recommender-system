@@ -75,6 +75,10 @@ public class PersonalizedRecommenderService {
      * @param items ["item1的id rate1", "item2的id, rate2", ...]
      * @return
      */
+
+    /*
+    新增
+     */
     public synchronized String updateRecommend(String sessionId, Integer userId, JSONArray items) {
         ArrayList<String> arrayList = new ArrayList<>(items.size());
         for(int i = 0; i < items.size(); ++i) {
@@ -85,4 +89,5 @@ public class PersonalizedRecommenderService {
         logger.info(LoggerUtil.info(sessionId, result));
         return result;
     }
+
 }

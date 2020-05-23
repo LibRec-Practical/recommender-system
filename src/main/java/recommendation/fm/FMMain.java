@@ -1,5 +1,9 @@
 package recommendation.fm;
 
+import util.hbase.HBaseUtils_mjs;
+import util.hbase.HbaseUtil;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -51,6 +55,12 @@ public class FMMain {
         System.out.println("predict: ");
         for(int i = 0; i < predict.length; ++i) {
             System.out.println(i + " label: " + label[i] + " predict: " + predict[i]);
+            // 以FM算法为例，将结果插入HBase
+            try {
+                HBaseUtils_mjs.add("FMRec",Integer.toString(i),"predict","predict_result",Double.toString(predict[i]));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         System.out.println();
     }

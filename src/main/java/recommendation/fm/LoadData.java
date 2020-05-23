@@ -19,7 +19,8 @@ public class LoadData {
         ArrayList<double[]> f = new ArrayList<>();
         ArrayList<Double> l = new ArrayList<>();
         try {
-            File file = new File("D:\\study\\大四上\\毕设\\文件\\csv\\filmtrust\\ratings.txt");
+            // 绝对路径需修改，文件已附在本git中，resources/localTrainData/ratings.txt
+            File file = new File("D:\\PROJECT\\recommender-system\\src\\main\\resources\\localTrainData\\ratings.txt");
             InputStreamReader inputStream = new InputStreamReader(new FileInputStream(file));
             BufferedReader reader = new BufferedReader(inputStream);
             String line;
