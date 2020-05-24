@@ -36,7 +36,6 @@ public class NonNegativeMatrixFactorization {
     // 下面四个类按名字来看就行，用来转换id和对应坐标的
     // 比如userIdToColumnMap就是用户id转对应列号，itemIdToRowMap就是商品id转对应行号，另外两个就是反过来
     // 评分矩阵是商品-用户的，行号代表商品，列号代表用户
-
     private HashMap<Integer, Integer> userIdToColumnMap = new HashMap<>();
 
     private HashMap<Integer, Integer> columnToUserIdMap = new HashMap<>();
@@ -52,6 +51,14 @@ public class NonNegativeMatrixFactorization {
             this.iid = iid;
             this.rate = rate;
         }
+    }
+
+    public Matrix getW() {
+        return W;
+    }
+
+    public Matrix getH() {
+        return H;
     }
 
     public NonNegativeMatrixFactorization() {}
@@ -133,6 +140,7 @@ public class NonNegativeMatrixFactorization {
             vK[itemId] = rate;
         }
         trainIncr(vK);
+
     }
 
     /**
@@ -222,6 +230,7 @@ public class NonNegativeMatrixFactorization {
 //        W.print();
 //        System.out.println("H:");
 //        H.print();
+
     }
 
     private double loss() {

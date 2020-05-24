@@ -7,9 +7,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import pojo.Goods;
 import recommendation.mf.NonNegativeMatrixFactorization;
+import util.calculation.Matrix;
+import util.hbase.HBaseUtils_mjs;
 import util.json.JsonUtil;
 import util.logger.LoggerUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -75,10 +78,6 @@ public class PersonalizedRecommenderService {
      * @param items ["item1的id rate1", "item2的id, rate2", ...]
      * @return
      */
-
-    /*
-    新增
-     */
     public synchronized String updateRecommend(String sessionId, Integer userId, JSONArray items) {
         ArrayList<String> arrayList = new ArrayList<>(items.size());
         for(int i = 0; i < items.size(); ++i) {
@@ -87,6 +86,22 @@ public class PersonalizedRecommenderService {
         nonNegativeMatrixFactorization.trainIncr(userId, arrayList);
         String result = JsonUtil.getJsonResult(0, "成功");
         logger.info(LoggerUtil.info(sessionId, result));
+        // 将更新后的推荐结果写入HBase
+        Matrix rec_res_matrix = nonNegativeMatrixFactorization.getW().multiply(nonNegativeMatrixFactorization.getH());
+        double[][] rec_res_array = rec_res_matrix.num;
+        for (int row = 0;row<rec_res_matrix.getRow();row++){
+            for (int col = 0;row<rec_res_matrix.getColumn();col++){
+                try {
+                    HBaseUtils_mjs.add("Personized_rec",
+                            Integer.toString(row),
+                            "items",
+                            "rec_item_rate",
+                            Double.toString(rec_res_array[row][col]));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         return result;
     }
 
