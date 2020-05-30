@@ -45,14 +45,14 @@
     <!-- 包名 -->
     <logger name="service.service" additivity="false">
         <!-- debug日志太多了可以改成info级别打印日志 -->
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="fileAppender"/>
         <appender-ref ref="flumeAppender"/>
         <!--<appender-ref ref="console"/>-->
     </logger>
 
     <root>
-        <level value="debug"/>
+        <level value="WARN"/>
         <appender-ref ref="console"/>
     </root>
 </log4j:configuration>

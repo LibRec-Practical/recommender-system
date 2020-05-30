@@ -1,17 +1,22 @@
 package util.kafka;
 
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.CreateTopicsResult;
-import org.apache.kafka.clients.admin.DeleteTopicsResult;
-import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.common.KafkaFuture;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.spark.Partition;
+import org.springframework.beans.factory.annotation.Autowired;
+import service.service.PersonalizedRecommenderService;
 import util.config.Configs;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 public class KafkaUtil {
     private static AdminClient adminClient;
@@ -19,6 +24,7 @@ public class KafkaUtil {
     // kafka相关参数
     private static HashMap<String, Object> producerParams = new HashMap<>();
     private static HashMap<String, Object> consumerParams = new HashMap<>();
+
 
     static {
         properties = new Properties();
@@ -34,6 +40,8 @@ public class KafkaUtil {
         consumerParams.put("auto.commit.interval.ms", "1000");
         consumerParams.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         consumerParams.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
 
     private KafkaUtil() {
@@ -57,6 +65,13 @@ public class KafkaUtil {
         }
     }
 
+    public static KafkaConsumer<String, String> getCommentTopicConsumer(){
+        consumerParams.put("group.id","mj_test_kfk");
+        consumerParams.put("auto.offset.reset","earliest");
+        consumerParams.put("enable.auto.commit",false);
+        return new KafkaConsumer<String, String>(consumerParams);
+    }
+
     public static void deleteTopic(String topic) {
         try {
             adminClient = AdminClient.create(properties);
@@ -75,5 +90,8 @@ public class KafkaUtil {
 
     public static KafkaConsumer<String, String> getConsumer() {
         return new KafkaConsumer<>(consumerParams);
+    }
+
+    public static void main(String[] args){
     }
 }

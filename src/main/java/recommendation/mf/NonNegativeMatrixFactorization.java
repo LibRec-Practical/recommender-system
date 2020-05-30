@@ -1,6 +1,7 @@
 package recommendation.mf;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import util.calculation.Matrix;
 
 import javax.annotation.PostConstruct;
@@ -75,7 +76,7 @@ public class NonNegativeMatrixFactorization {
         this.column = 10;
         V = new Matrix(row, column);
         try {
-            File file = new File("D:\\study\\大四上\\毕设\\文件\\csv\\filmtrust\\ratings.txt");
+            File file = new File("D:\\PROJECT\\recommender-system\\src\\main\\resources\\localTrainData\\ratings.txt");
             InputStreamReader inputStream = new InputStreamReader(new FileInputStream(file));
             BufferedReader reader = new BufferedReader(inputStream);
             String line;
