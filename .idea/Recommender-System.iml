@@ -2,7 +2,14 @@
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Spring" name="Spring">
-      <configuration />
+      <configuration>
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/src/main/java/util/config/SpringSessionConfiguration.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/application/App.java</file>
+          <file>jar://$MAVEN_REPOSITORY$/io/netty/netty/3.9.4.Final/netty-3.9.4.Final.jar!/org/jboss/netty/container/spring/beans.xml</file>
+          <file>file://$MAVEN_REPOSITORY$/io/netty/netty/3.9.4.Final/netty-3.9.4.Final.jar</file>
+        </fileset>
+      </configuration>
     </facet>
     <facet type="web" name="Web">
       <configuration>

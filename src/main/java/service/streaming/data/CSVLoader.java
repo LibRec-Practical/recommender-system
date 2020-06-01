@@ -86,12 +86,12 @@ public class CSVLoader extends BaseLoader {
         return false;
     }
 
-    @Scheduled(initialDelay = 5000, fixedRate = 5000)
-    private void sendMessage() {
-        System.out.println("定时生产数据");
-        Random random = new Random();
-        for (int i = 0; i < 100; ++i) {
-            kafkaProducer.send(new ProducerRecord<>(Configs.KAFKA_TOPIC, list.get(random.nextInt(list.size()))));
-        }
-    }
+//    @Scheduled(initialDelay = 5000, fixedRate = 5000)
+//    private void sendMessage() {
+//        System.out.println("定时生产数据");
+//        Random random = new Random();
+//        for (int i = 0; i < 100; ++i) {
+//            kafkaProducer.send(new ProducerRecord<>(Configs.KAFKA_TOPIC, list.get(random.nextInt(list.size()))));
+//        }
+//    }
 }

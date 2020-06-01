@@ -35,7 +35,7 @@ public class PopularityRecommenderService {
             // key：物品名
             // value：热度值
             value = jedis.get(key);
-            System.out.println("key: " + key + " value: " + value);
+//            System.out.println("key: " + key + " value: " + value);
             if (value.matches("[0-9]*")) {
                 // 将键值存入ArrayList
                 arrayList.add(new Node(key, Integer.valueOf(value)));
@@ -43,7 +43,7 @@ public class PopularityRecommenderService {
         }
         Collections.sort(arrayList);
         ArrayList<String> hotList = new ArrayList<>();
-        for (int i = 0, size = Math.min(arrayList.size(), 10); i < size; ++i) {
+        for (int i = 0, size = Math.min(arrayList.size(), 200); i < size; ++i) {
             hotList.add(arrayList.get(i).name);
         }
         String result = JSON.toJSONString(hotList);

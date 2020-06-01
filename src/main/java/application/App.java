@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"service", "recommendation"})
+@ComponentScan(basePackages = {"service", "recommendation","recommendation.mf"})
 @MapperScan(basePackages = "dao")
 @EnableScheduling
 public class App {

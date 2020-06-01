@@ -13,6 +13,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 import service.service.PersonalizedRecommenderService;
 import util.config.Configs;
+import util.hbase.HBaseUtils_mjs;
 import util.hbase.HbaseUtil;
 import util.kafka.KafkaUtil;
 import util.redis.RedisUtil;
@@ -42,7 +43,8 @@ public class MessageConsumer {
 //        consumerParams.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 //        consumer_test = new KafkaConsumer<>(consumerParams);
 //        consumer_test.subscribe(Arrays.asList("xlc_test"));
-        consumer.subscribe(Arrays.asList("librecmall.comment_r1p1"));
+//        consumer.subscribe(Arrays.asList("librecmall.comment_r1p1"));
+        consumer.subscribe(Arrays.asList("librecmall.footprint_r1p1"));
     }
 
     private Jedis jedis = RedisUtil.getConnection();
@@ -50,39 +52,73 @@ public class MessageConsumer {
 
     @Scheduled(initialDelay = 2000, fixedRate = 10000)
     private void consume() {
-            ConsumerRecords<String, String> records = consumer.poll(100);
-            HashMap<Integer, StringBuilder> userRatingsMap = new HashMap<>();
+        ConsumerRecords<String, String> records = consumer.poll(100);
+        Pipeline pipeline = jedis.pipelined();
 
-            for (ConsumerRecord<String, String> record : records) {
-                String recordJson = record.value();
-                JSONObject commentJsonObject = JSON.parseObject(recordJson);
-                String msg = commentJsonObject.getString("msg");
-                JSONObject msgJsonObject = JSON.parseObject(msg);
-                String goodId = msgJsonObject.getString("valueId");
-                String star = msgJsonObject.getString("star");
-                int userId = msgJsonObject.getInteger("userId");
-                String goodAndRating = "["+goodId+","+star+"],";
-                if (userRatingsMap.containsKey(userId)){
-                    StringBuilder ratingsBuilder = userRatingsMap.get(userId);
-                    ratingsBuilder.append(goodAndRating);
-                }else{
-                    StringBuilder ratingsBuilder = new StringBuilder("[");
-                    ratingsBuilder.append(goodAndRating);
-                    userRatingsMap.put(userId,ratingsBuilder);
-                }
-            }
-            if (userRatingsMap.size() > 0){
-                for (Integer userId: userRatingsMap.keySet()){
-                    StringBuilder ratingsBuilder = userRatingsMap.get(userId);
-                    ratingsBuilder.deleteCharAt(ratingsBuilder.length() - 1);
-                    ratingsBuilder.append("]");
-                    String arrJson = ratingsBuilder.toString();
-                    JSONArray ratingsJSONArray = JSONObject.parseArray(arrJson);
-                    System.out.println(arrJson);
+//            这里是李思宽的代码
+        if (!records.isEmpty()){
+            System.out.println("<<<Kafka实时轮询 消费数据>>>");
+        }
+        for (ConsumerRecord<String, String> record : records) {
+            String recordJson = record.value();
+            System.out.println(recordJson);
+            JSONObject footprintJsonObject = JSON.parseObject(recordJson);
+            String msg = footprintJsonObject.getString("msg");
+            JSONObject msgJsonObject = JSON.parseObject(msg);
+            int id = msgJsonObject.getInteger("id"); // 可以拿来当offset记录
+            int userId = msgJsonObject.getInteger("userId");
+            String goodId = msgJsonObject.getString("goodsId");
+            String key = userId + "_" + goodId;
 
-                    personalizedRecommenderService.updateRecommend("IncrFromKafka",userId,ratingsJSONArray);
-                }
+            try {
+//                System.out.println("key: " + key + " value: " + jedis.incr(key));
+                pipeline.incr(key);
+//                jedis.incr(key);
+//                HBaseUtils_mjs.add("librec_rec_res_pop",
+//                        Integer.toString(row),
+//                        "items",
+//                        "rec_item_rate",
+//                        Double.toString());
+            } catch (Exception e) {
+                System.err.println("something went wrong at item " + key);
+//                e.printStackTrace();
+//                return;
             }
+        }
+        pipeline.sync();
+
+
+//            这里是杰生的代码
+//            for (ConsumerRecord<String, String> record : records) {
+//                String recordJson = record.value();
+//                JSONObject commentJsonObject = JSON.parseObject(recordJson);
+//                String msg = commentJsonObject.getString("msg");
+//                JSONObject msgJsonObject = JSON.parseObject(msg);
+//                String goodId = msgJsonObject.getString("valueId");
+//                String star = msgJsonObject.getString("star");
+//                int userId = msgJsonObject.getInteger("userId");
+//                String goodAndRating = "["+goodId+","+star+"],";
+//                if (userRatingsMap.containsKey(userId)){
+//                    StringBuilder ratingsBuilder = userRatingsMap.get(userId);
+//                    ratingsBuilder.append(goodAndRating);
+//                }else{
+//                    StringBuilder ratingsBuilder = new StringBuilder("[");
+//                    ratingsBuilder.append(goodAndRating);
+//                    userRatingsMap.put(userId,ratingsBuilder);
+//                }
+//            }
+//            if (userRatingsMap.size() > 0){
+//                for (Integer userId: userRatingsMap.keySet()){
+//                    StringBuilder ratingsBuilder = userRatingsMap.get(userId);
+//                    ratingsBuilder.deleteCharAt(ratingsBuilder.length() - 1);
+//                    ratingsBuilder.append("]");
+//                    String arrJson = ratingsBuilder.toString();
+//                    JSONArray ratingsJSONArray = JSONObject.parseArray(arrJson);
+//                    System.out.println(arrJson);
+//
+//                    personalizedRecommenderService.updateRecommend("IncrFromKafka",userId,ratingsJSONArray);
+//                }
+//            }
 
 
 //        ConsumerRecords<String, String> consumerRecords = consumer.poll(100);
@@ -111,7 +147,7 @@ public class MessageConsumer {
 //
 //    @Scheduled(initialDelay = 2000, fixedRate = 10000)
 //    private void consumeTest() {
-        // 测试Kafka broker
+// 测试Kafka broker
 //    }
 }
 

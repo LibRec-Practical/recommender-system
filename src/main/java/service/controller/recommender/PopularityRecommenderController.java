@@ -19,7 +19,7 @@ public class PopularityRecommenderController {
      * @param session
      * @return
      */
-    @RequestMapping(name = "/check", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(name = "/rec/online", method = {RequestMethod.GET, RequestMethod.POST})
     public String getRecommendResult(HttpSession session) {
         return popularityRecommenderService.getRecommendResult(session.getId());
     }

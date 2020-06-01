@@ -76,7 +76,7 @@ public class NonNegativeMatrixFactorization {
         this.column = 10;
         V = new Matrix(row, column);
         try {
-            File file = new File("D:\\PROJECT\\recommender-system\\src\\main\\resources\\localTrainData\\ratings.txt");
+            File file = new File("D:\\GitLab\\Librec实战\\recommender-system\\src\\main\\resources\\localTrainData\\ratings.txt");
             InputStreamReader inputStream = new InputStreamReader(new FileInputStream(file));
             BufferedReader reader = new BufferedReader(inputStream);
             String line;
@@ -107,6 +107,11 @@ public class NonNegativeMatrixFactorization {
                     }
                 }
             }
+
+            System.out.println(userIdToColumnMap);
+            System.out.println(columnToUserIdMap);
+            System.out.println(itemIdToRowMap);
+            System.out.println(rowToItemIdMap);
 //            System.out.println("maxuid: " + maxuid + " maxiid: " + maxiid + " maxrating: " + maxrating);
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,6 +130,8 @@ public class NonNegativeMatrixFactorization {
      * @param items ["item1的id, rate1", "item2的id, rate2", ...]
      */
     public void trainIncr(Integer userId, ArrayList<String> items) {
+        System.out.println("***************************");
+
         if(!userIdToColumnMap.containsKey(userId)) {
             userIdToColumnMap.put(userId, columnToUserIdMap.size());
             columnToUserIdMap.put(columnToUserIdMap.size(), userId);
@@ -132,10 +139,14 @@ public class NonNegativeMatrixFactorization {
         double[] vK = new double[V.getRow()];
         // 设置一个默认的喜好
         vK[0] = 3.0;
+
         for (String item: items) {
+
             // 商品id和评分拆开
-            String[] strings = item.split(" ");
-            int itemId = Integer.valueOf(strings[0]);
+            String[] strings = item.split(",");
+            int itemId = Integer.valueOf(strings[0].substring(1));
+            System.out.println(itemId);
+            System.out.println(itemIdToRowMap);
             itemId = itemIdToRowMap.get(itemId);
             double rate = Double.valueOf(strings[1]);
             vK[itemId] = rate;
